@@ -65,7 +65,7 @@
     <div class="label" id="tableName">Vokale</div>
     <div class="question" id="question">Welchen Vokal hörst du?</div>
     <button id="listen" aria-label="Anhören">🔊</button>
-    <p class="sub">Tippe auf den Lautsprecher und wähle die richtige Antwort.</p>
+    <p class="sub">Tippe auf den Lautsprecher. Der Laut wird langsam und deutlich gesprochen.</p>
     <div class="answers" id="answers"></div>
     <div id="feedback"></div>
     <div id="explain"></div>
@@ -162,12 +162,12 @@ function speakText(text,rate){
   try{
     speechSynthesis.cancel();
     var u=new SpeechSynthesisUtterance(text.toLowerCase());
-    u.lang="de-DE";u.rate=rate||0.72;u.pitch=1;
+    u.lang="de-DE";u.rate=rate||0.52;u.pitch=1;
     speechSynthesis.speak(u);
   }catch(e){feedback.textContent="Ton konnte nicht gestartet werden.";}
 }
 
-listen.addEventListener("click",function(){speakText(current,level().type==="vowel"?0.62:0.72);});
+listen.addEventListener("click",function(){speakText(current,level().type==="vowel"?0.42:0.50);});
 
 function showExplanation(){
   if(level().type==="vowel"){
