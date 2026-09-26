@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#f4f6ff">
+  <title>Vokal-Abenteuer – Safari-Version</title>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin:0; min-height:100%; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#f4f6ff; color:#1f2430; }
+    body { display:flex; justify-content:center; padding:16px; }
+    .app { width:min(720px,100%); }
+    .top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+    h1 { font-size:clamp(1.8rem,6vw,2.8rem); margin:0; }
+    .stars { background:white; border-radius:999px; padding:10px 14px; box-shadow:0 8px 24px rgba(0,0,0,.08); font-weight:700; }
+    .card { background:white; border-radius:24px; padding:24px 18px; box-shadow:0 12px 32px rgba(0,0,0,.10); text-align:center; }
+    .label { color:#687084; font-size:.85rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+    .question { font-size:clamp(1.35rem,5vw,2rem); font-weight:800; margin:10px 0 18px; }
+    #listenBtn {
+      width:110px; height:110px; border:0; border-radius:50%;
+      background:#4c63ff; color:white; font-size:3rem; cursor:pointer;
+      box-shadow:0 10px 24px rgba(76,99,255,.30);
+      touch-action:manipulation;
+    }
+    #listenBtn:active { transform:scale(.97); }
+    .sub { margin:12px 0 0; color:#687084; }
+    .answers { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:24px; }
+    .answer {
+      min-height:76px; border:3px solid #e7e9f2; border-radius:18px; background:white;
+      font-size:clamp(1.8rem,8vw,2.7rem); font-weight:900; cursor:pointer; touch-action:manipulation;
+    }
+    .answer.correct { border-color:#2f9e44; background:#ebfbee; }
+    .answer.wrong { border-color:#d9485f; background:#fff0f3; }
+    #feedback { min-height:46px; display:flex; justify-content:center; align-items:center; font-size:1.2rem; font-weight:800; margin-top:16px; }
+    #example { display:none; background:#f6f7ff; border-radius:16px; padding:12px; font-size:1.15rem; }
+    #example.show { display:block; }
+    .note { text-align:center; color:#687084; font-size:.9rem; margin-top:12px; line-height:1.4; }
+
+    .game {
+      position:fixed; inset:0; z-index:10; display:none; flex-direction:column; align-items:center; justify-content:center;
+      background:linear-gradient(#0b1026,#111a3e); color:white; padding:16px;
+    }
+    .game.show { display:flex; }
+    .gamebar { width:min(680px,100%); display:flex; justify-content:space-between; font-weight:800; margin-bottom:10px; }
+    canvas { width:min(680px,100%); aspect-ratio:4/3; background:#070b20; border-radius:18px; touch-action:none; }
+    .controls { width:min(520px,100%); display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:12px; }
+    .ctrl { min-height:62px; border:0; border-radius:16px; font-size:1.7rem; font-weight:900; background:white; color:#10162e; touch-action:manipulation; }
+    .ctrl.fire { background:#ffd43b; }
+    #gameMsg { min-height:28px; font-weight:700; margin-top:10px; text-align:center; }
+    @media (max-width:520px){ .answers{gap:6px} .answer{min-height:66px} }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="top">
+      <h1>Vokal-Abenteuer</h1>
+      <div class="stars">⭐ <span id="starCount">0</span>/3</div>
+    </div>
+
+    <section class="card">
+      <div class="label">Hören und erkennen</div>
+      <div class="question">Welchen Vokal hörst du?</div>
+
+      <button id="listenBtn" aria-label="Vokal anhören">🔊</button>
+      <p class="sub">Tippe zuerst auf den Lautsprecher.</p>
+
+      <div class="answers">
+        <button class="answer" data-v="A">A</button>
+        <button class="answer" data-v="E">E</button>
+        <button class="answer" data-v="I">I</button>
+        <button class="answer" data-v="O">O</button>
+        <button class="answer" data-v="U">U</button>
+      </div>
+
+      <div id="feedback"></div>
+      <div id="example"></div>
+    </section>
+
+    <div class="note">
+      Diese Version ist für Safari/iPad vereinfacht: keine automatische Sprachausgabe beim Laden.
+      Der Ton startet nur nach einem Fingertipp.
+    </div>
+  </main>
+
+  <section id="game" class="game" aria-label="Belohnungsspiel">
+    <div class="gamebar">
+      <span>🚀 Sternenjäger</span>
+      <span><span id="timeLeft">10</span>s · Punkte: <span id="score">0</span></span>
+    </div>
+    <canvas id="canvas" width="680" height="510"></canvas>
+    <div class="controls">
+      <button id="left" class="ctrl">◀</button>
+      <button id="fire" class="ctrl fire">●</button>
+      <button id="right" class="ctrl">▶</button>
+    </div>
+    <div id="gameMsg">Triff die Sterne!</div>
+  </section>
+
+<script>
+(function(){
+  "use strict";
+
+  var vowels = ["A","E","I","O","U"];
+  var examples = {
+    A:["Apfel","🍎"],
+    E:["Ente","🦆"],
+    I:["Igel","🦔"],
+    O:["Orange","🍊"],
+    U:["Uhu","🦉"]
+  };
+
+  var current = "A";
+  var last = "";
+  var correctCount = 0;
+  var locked = false;
+
+  var listenBtn = document.getElementById("listenBtn");
+  var feedback = document.getElementById("feedback");
+  var example = document.getElementById("example");
+  var starCount = document.getElementById("starCount");
+  var answerButtons = Array.prototype.slice.call(document.querySelectorAll(".answer"));
+
+  function chooseVowel(){
+    var pool = vowels.filter(function(v){ return v !== last; });
+    current = pool[Math.floor(Math.random()*pool.length)];
+    last = current;
+    locked = false;
+    feedback.textContent = "";
+    example.textContent = "";
+    example.className = "";
+    answerButtons.forEach(function(b){
+      b.classList.remove("correct","wrong");
+    });
+  }
+
+  function speakText(text, rate){
+    if(!("speechSynthesis" in window)){
+      feedback.textContent = "Sprachausgabe wird auf diesem Gerät nicht unterstützt.";
+      return;
+    }
+    try{
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = "de-DE";
+      u.rate = rate || 0.75;
+      u.pitch = 1.0;
+      window.speechSynthesis.speak(u);
+    }catch(e){
+      feedback.textContent = "Ton konnte nicht gestartet werden.";
+    }
+  }
+
+  listenBtn.addEventListener("click", function(){
+    speakText(current, 0.65);
+  });
+
+  answerButtons.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      if(locked) return;
+
+      var chosen = btn.getAttribute("data-v");
+
+      if(chosen === current){
+        locked = true;
+        btn.classList.add("correct");
+        feedback.textContent = "✅ Richtig!";
+        var ex = examples[current];
+        example.innerHTML = "<strong>"+current+"</strong> wie <strong>"+ex[0]+"</strong> "+ex[1];
+        example.className = "show";
+        correctCount++;
+        starCount.textContent = correctCount;
+
+        setTimeout(function(){
+          if(correctCount >= 3){
+            correctCount = 0;
+            starCount.textContent = "0";
+            startGame();
+          }else{
+            chooseVowel();
+          }
+        }, 1200);
+
+      }else{
+        btn.classList.add("wrong");
+        feedback.textContent = "Fast. Hör noch einmal.";
+        setTimeout(function(){
+          btn.classList.remove("wrong");
+          feedback.textContent = "";
+        }, 800);
+      }
+    });
+  });
+
+  // ---------------- Reward game ----------------
+  var game = document.getElementById("game");
+  var canvas = document.getElementById("canvas");
+  var ctx = canvas.getContext("2d");
+  var timeLeft = document.getElementById("timeLeft");
+  var scoreEl = document.getElementById("score");
+  var gameMsg = document.getElementById("gameMsg");
+  var leftBtn = document.getElementById("left");
+  var rightBtn = document.getElementById("right");
+  var fireBtn = document.getElementById("fire");
+
+  var ship, bullets, targets, score, active, start, lastSpawn, raf;
+  var leftDown = false, rightDown = false;
+
+  function resetGame(){
+    ship = {x:canvas.width/2,y:canvas.height-55,w:50,h:30,speed:7};
+    bullets = [];
+    targets = [];
+    score = 0;
+    scoreEl.textContent = "0";
+    timeLeft.textContent = "10";
+    lastSpawn = 0;
+  }
+
+  function startGame(){
+    game.classList.add("show");
+    resetGame();
+    active = true;
+    start = performance.now();
+    gameMsg.textContent = "Triff die Sterne!";
+    raf = requestAnimationFrame(loop);
+  }
+
+  function endGame(){
+    active = false;
+    cancelAnimationFrame(raf);
+    gameMsg.textContent = "Geschafft! "+score+" Punkte.";
+    setTimeout(function(){
+      game.classList.remove("show");
+      chooseVowel();
+    }, 1400);
+  }
+
+  function shoot(){
+    if(!active) return;
+    bullets.push({x:ship.x,y:ship.y-20,speed:10});
+  }
+
+  function spawn(){
+    targets.push({
+      x:25+Math.random()*(canvas.width-50),
+      y:-25,
+      r:18+Math.random()*7,
+      speed:2+Math.random()*2
+    });
+  }
+
+  function update(now){
+    if(leftDown) ship.x -= ship.speed;
+    if(rightDown) ship.x += ship.speed;
+    ship.x = Math.max(25, Math.min(canvas.width-25, ship.x));
+
+    bullets.forEach(function(b){ b.y -= b.speed; });
+    bullets = bullets.filter(function(b){ return b.y > -20; });
+
+    if(now-lastSpawn > 500){
+      spawn();
+      lastSpawn = now;
+    }
+
+    targets.forEach(function(t){ t.y += t.speed; });
+    targets = targets.filter(function(t){ return t.y < canvas.height+30; });
+
+    for(var i=targets.length-1;i>=0;i--){
+      for(var j=bullets.length-1;j>=0;j--){
+        var dx = targets[i].x-bullets[j].x;
+        var dy = targets[i].y-bullets[j].y;
+        if(Math.sqrt(dx*dx+dy*dy) < targets[i].r+6){
+          targets.splice(i,1);
+          bullets.splice(j,1);
+          score++;
+          scoreEl.textContent = score;
+          break;
+        }
+      }
+    }
+  }
+
+  function star(x,y,r){
+    ctx.beginPath();
+    for(var i=0;i<10;i++){
+      var rr = (i%2===0)?r:r*0.45;
+      var a = -Math.PI/2 + i*Math.PI/5;
+      var px = x + Math.cos(a)*rr;
+      var py = y + Math.sin(a)*rr;
+      if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.closePath();
+    ctx.fillStyle = "#ffd43b";
+    ctx.fill();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle = "rgba(255,255,255,.65)";
+    for(var i=0;i<45;i++){
+      ctx.fillRect((i*113)%canvas.width,(i*67)%canvas.height,2,2);
+    }
+
+    ctx.save();
+    ctx.translate(ship.x,ship.y);
+    ctx.fillStyle="#8be9fd";
+    ctx.beginPath();
+    ctx.moveTo(0,-23);
+    ctx.lineTo(-25,16);
+    ctx.lineTo(-7,10);
+    ctx.lineTo(0,20);
+    ctx.lineTo(7,10);
+    ctx.lineTo(25,16);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    ctx.fillStyle="#ffffff";
+    bullets.forEach(function(b){
+      ctx.beginPath();
+      ctx.arc(b.x,b.y,5,0,Math.PI*2);
+      ctx.fill();
+    });
+
+    targets.forEach(function(t){ star(t.x,t.y,t.r); });
+  }
+
+  function loop(now){
+    if(!active) return;
+
+    var elapsed = (now-start)/1000;
+    var remaining = Math.max(0, 10-Math.floor(elapsed));
+    timeLeft.textContent = remaining;
+
+    update(now);
+    draw();
+
+    if(elapsed >= 10){
+      endGame();
+      return;
+    }
+    raf = requestAnimationFrame(loop);
+  }
+
+  function bindHold(el,startFn,endFn){
+    el.addEventListener("pointerdown", function(e){ e.preventDefault(); startFn(); });
+    el.addEventListener("pointerup", function(e){ e.preventDefault(); endFn(); });
+    el.addEventListener("pointercancel", function(e){ e.preventDefault(); endFn(); });
+    el.addEventListener("pointerleave", function(e){ e.preventDefault(); endFn(); });
+  }
+
+  bindHold(leftBtn,function(){leftDown=true;},function(){leftDown=false;});
+  bindHold(rightBtn,function(){rightDown=true;},function(){rightDown=false;});
+  fireBtn.addEventListener("pointerdown", function(e){ e.preventDefault(); shoot(); });
+
+  chooseVowel();
+})();
+</script>
+</body>
+</html>
