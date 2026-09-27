@@ -5,335 +5,338 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFF4E3">
 <title>Deutsch lernen</title>
+
 <style>
-  :root {
-    --bg: #FFF4E3;
-    --panel: #FFFFFF;
-    --text: #2D2A4A;
-    --text-soft: #837FB0;
-    --primary: #2EC4B6;
-    --primary-dark: #1E9C90;
-    --accent: #FF7A50;
-    --accent-dark: #DE5C30;
-    --correct: #4CAF6D;
-    --correct-dark: #35894F;
-    --incorrect: #EF6659;
-    --incorrect-dark: #C84B3F;
-    --space-1: #211C5E;
-    --space-2: #06071C;
-    --safe-t: env(safe-area-inset-top, 0px);
-    --safe-b: env(safe-area-inset-bottom, 0px);
-    --safe-l: env(safe-area-inset-left, 0px);
-    --safe-r: env(safe-area-inset-right, 0px);
-  }
+:root{
+  --bg:#FFF4E3;
+  --panel:#FFFFFF;
+  --text:#2D2A4A;
+  --text-soft:#837FB0;
+  --primary:#2EC4B6;
+  --primary-dark:#1E9C90;
+  --accent:#FF7A50;
+  --accent-dark:#DE5C30;
+  --correct:#4CAF6D;
+  --correct-dark:#35894F;
+  --neutral-wrong:#F3B562;
+  --neutral-wrong-dark:#9A641C;
+  --space-1:#211C5E;
+  --space-2:#06071C;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-l:env(safe-area-inset-left,0px);
+  --safe-r:env(safe-area-inset-right,0px);
+}
 
-  * { box-sizing: border-box; }
+*{box-sizing:border-box}
 
-  html { height: 100%; }
+html{height:100%}
 
-  body {
-    position: fixed;
-    inset: 0;
-    margin: 0;
-    height: 100%;
-    overflow: hidden;
-    overscroll-behavior: none;
-    touch-action: none;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-font-smoothing: antialiased;
-    font-family: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: var(--text);
-    background: var(--bg);
-  }
+body{
+  position:fixed;
+  inset:0;
+  margin:0;
+  height:100%;
+  overflow:hidden;
+  overscroll-behavior:none;
+  touch-action:none;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-font-smoothing:antialiased;
+  font-family:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+}
 
-  button {
-    font-family: inherit;
-    color: inherit;
-    cursor: pointer;
-  }
+button{font-family:inherit;color:inherit;cursor:pointer}
+.hidden{display:none!important}
 
-  .hidden { display: none !important; }
+#app{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  padding:calc(var(--safe-t) + 10px) calc(var(--safe-r) + 14px) calc(var(--safe-b) + 10px) calc(var(--safe-l) + 14px);
+}
 
-  #app {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    padding: calc(var(--safe-t) + 10px) calc(var(--safe-r) + 14px) calc(var(--safe-b) + 10px) calc(var(--safe-l) + 14px);
-  }
+/* Status */
+#statusBar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  font-size:clamp(13px,2.5vw,19px);
+  font-weight:750;
+  color:var(--text-soft);
+  flex-shrink:0;
+}
+#statusBar span{
+  background:var(--panel);
+  padding:6px 12px;
+  border-radius:999px;
+}
 
-  /* ---------- Status bar ---------- */
-  #statusBar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: clamp(15px, 2.6vw, 20px);
-    font-weight: 700;
-    color: var(--text-soft);
-    flex-shrink: 0;
-  }
-  #statusBar span {
-    background: var(--panel);
-    padding: 6px 14px;
-    border-radius: 999px;
-  }
+/* Learning */
+#learningScreen{
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:6px 0;
+}
 
-  /* ---------- Learning screen ---------- */
-  #learningScreen {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 6px 0;
-  }
+.speaker-wrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+}
 
-  .speaker-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-  }
+#speakerBtn{
+  width:clamp(108px,26vw,190px);
+  height:clamp(108px,26vw,190px);
+  border-radius:50%;
+  border:none;
+  background:var(--accent);
+  box-shadow:0 8px 0 var(--accent-dark);
+  font-size:clamp(44px,11vw,78px);
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  touch-action:manipulation;
+  transition:transform .08s ease,box-shadow .08s ease,opacity .15s ease;
+}
+#speakerBtn:active{
+  transform:translateY(6px);
+  box-shadow:0 2px 0 var(--accent-dark);
+}
+#speakerBtn[disabled]{opacity:.55}
 
-  #speakerBtn {
-    width: clamp(108px, 26vw, 190px);
-    height: clamp(108px, 26vw, 190px);
-    border-radius: 50%;
-    border: none;
-    background: var(--accent);
-    box-shadow: 0 8px 0 var(--accent-dark);
-    font-size: clamp(44px, 11vw, 78px);
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    touch-action: manipulation;
-    transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.15s ease;
-  }
-  #speakerBtn:active {
-    transform: translateY(6px);
-    box-shadow: 0 2px 0 var(--accent-dark);
-  }
-  #speakerBtn[disabled] { opacity: 0.55; }
+#speakerHint{
+  font-size:clamp(14px,2.6vw,19px);
+  font-weight:650;
+  color:var(--text-soft);
+  text-align:center;
+}
 
-  #speakerHint {
-    font-size: clamp(14px, 2.6vw, 19px);
-    font-weight: 600;
-    color: var(--text-soft);
-  }
+#feedbackArea{
+  min-height:clamp(64px,12vh,100px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:4px;
+  flex-shrink:0;
+  padding:0 8px;
+}
+#feedbackMsg{
+  font-size:clamp(20px,4.2vw,32px);
+  font-weight:800;
+}
+#feedbackMsg.correct{color:var(--correct-dark)}
+#feedbackMsg.incorrect{color:var(--neutral-wrong-dark)}
+#feedbackExtra{
+  font-size:clamp(16px,3.2vw,24px);
+  font-weight:700;
+  color:var(--text-soft);
+}
 
-  #feedbackArea {
-    min-height: clamp(50px, 10vh, 84px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 2px;
-    flex-shrink: 0;
-    padding: 0 8px;
-  }
-  #feedbackMsg {
-    font-size: clamp(20px, 4.2vw, 32px);
-    font-weight: 800;
-  }
-  #feedbackMsg.correct { color: var(--correct-dark); }
-  #feedbackMsg.incorrect { color: var(--incorrect-dark); }
-  #feedbackExtra {
-    font-size: clamp(16px, 3.2vw, 24px);
-    font-weight: 700;
-    color: var(--text-soft);
-  }
+.answers{
+  width:100%;
+  max-width:800px;
+  margin:0 auto;
+  display:flex;
+  flex-wrap:wrap;
+  align-content:center;
+  justify-content:center;
+  gap:clamp(10px,2vw,18px);
+  flex-shrink:0;
+}
 
-  .answers {
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: center;
-    justify-content: center;
-    gap: clamp(10px, 2vw, 18px);
-    flex-shrink: 0;
-  }
+.answer-btn{
+  flex:0 1 140px;
+  min-width:118px;
+  max-width:190px;
+  background:var(--primary);
+  color:white;
+  border:none;
+  border-radius:24px;
+  box-shadow:0 7px 0 var(--primary-dark);
+  font-size:clamp(28px,6vw,44px);
+  font-weight:800;
+  letter-spacing:.02em;
+  padding:clamp(16px,4vw,24px) 8px;
+  touch-action:manipulation;
+  transition:transform .08s ease,box-shadow .08s ease,background .1s ease;
+}
+.answer-btn:active{
+  transform:translateY(5px);
+  box-shadow:0 2px 0 var(--primary-dark);
+}
+.answer-btn[disabled]{opacity:.84}
+.answer-btn.correct{
+  background:var(--correct);
+  box-shadow:0 7px 0 var(--correct-dark);
+}
+.answer-btn.incorrect{
+  background:var(--neutral-wrong);
+  box-shadow:0 7px 0 var(--neutral-wrong-dark);
+}
 
-  .answer-btn {
-    flex: 0 1 140px;
-    min-width: 118px;
-    max-width: 190px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 24px;
-    box-shadow: 0 7px 0 var(--primary-dark);
-    font-size: clamp(28px, 6vw, 44px);
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    padding: clamp(16px, 4vw, 24px) 8px;
-    touch-action: manipulation;
-    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.1s ease;
-  }
-  .answer-btn:active {
-    transform: translateY(5px);
-    box-shadow: 0 2px 0 var(--primary-dark);
-  }
-  .answer-btn[disabled] { opacity: 0.8; }
-  .answer-btn.correct {
-    background: var(--correct);
-    box-shadow: 0 7px 0 var(--correct-dark);
-  }
-  .answer-btn.incorrect {
-    background: var(--incorrect);
-    box-shadow: 0 7px 0 var(--incorrect-dark);
-  }
+#resetProgressBtn{
+  background:none;
+  border:none;
+  color:var(--text-soft);
+  font-size:clamp(12px,2.2vw,15px);
+  text-decoration:underline;
+  padding:8px;
+  flex-shrink:0;
+  touch-action:manipulation;
+}
 
-  #resetProgressBtn {
-    background: none;
-    border: none;
-    color: var(--text-soft);
-    font-size: clamp(12px, 2.2vw, 15px);
-    text-decoration: underline;
-    padding: 8px;
-    flex-shrink: 0;
-    touch-action: manipulation;
-  }
+/* Reward game */
+#rewardScreen{
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  background:radial-gradient(ellipse at 50% 0%,var(--space-1),var(--space-2));
+  border-radius:22px;
+  overflow:hidden;
+  padding:10px;
+  gap:8px;
+}
 
-  /* ---------- Reward screen ---------- */
-  #rewardScreen {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    background: radial-gradient(ellipse at 50% 0%, var(--space-1), var(--space-2));
-    border-radius: 22px;
-    overflow: hidden;
-    padding: 10px;
-    gap: 8px;
-  }
-  #gameHud {
-    display: flex;
-    justify-content: space-between;
-    color: #FFFFFF;
-    font-weight: 800;
-    font-size: clamp(16px, 3.2vw, 24px);
-    padding: 4px 10px;
-    flex-shrink: 0;
-  }
-  #gameCanvasWrap {
-    flex: 1;
-    min-height: 0;
-    position: relative;
-  }
-  #gameCanvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-    border-radius: 14px;
-  }
-  #gameControls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: clamp(16px, 4vw, 30px);
-    flex-shrink: 0;
-    padding: 4px 0 2px;
-  }
-  .game-btn {
-    width: clamp(64px, 15vw, 96px);
-    height: clamp(64px, 15vw, 96px);
-    border-radius: 50%;
-    border: none;
-    background: rgba(255,255,255,0.16);
-    color: #FFFFFF;
-    font-size: clamp(24px, 6vw, 38px);
-    touch-action: none;
-    transition: background 0.1s ease, transform 0.08s ease;
-  }
-  .game-btn:active, .game-btn.pressed {
-    background: rgba(255,255,255,0.34);
-    transform: scale(0.94);
-  }
-  #btnFire { background: rgba(255, 122, 80, 0.55); }
-  #btnFire:active, #btnFire.pressed { background: rgba(255, 122, 80, 0.8); }
+#gameHud{
+  display:flex;
+  justify-content:space-between;
+  color:#fff;
+  font-weight:800;
+  font-size:clamp(16px,3.2vw,24px);
+  padding:4px 10px;
+  flex-shrink:0;
+}
+#gameCanvasWrap{
+  flex:1;
+  min-height:0;
+  position:relative;
+}
+#gameCanvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+  border-radius:14px;
+}
+#gameControls{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:clamp(16px,4vw,30px);
+  flex-shrink:0;
+  padding:4px 0 2px;
+}
+.game-btn{
+  width:clamp(64px,15vw,96px);
+  height:clamp(64px,15vw,96px);
+  border-radius:50%;
+  border:none;
+  background:rgba(255,255,255,.16);
+  color:#fff;
+  font-size:clamp(24px,6vw,38px);
+  touch-action:none;
+  transition:background .1s ease,transform .08s ease;
+}
+.game-btn:active,.game-btn.pressed{
+  background:rgba(255,255,255,.34);
+  transform:scale(.94);
+}
+#btnFire{background:rgba(255,122,80,.55)}
+#btnFire:active,#btnFire.pressed{background:rgba(255,122,80,.8)}
 
-  /* ---------- Reward complete / final complete ---------- */
-  #rewardCompleteScreen, #completeScreen {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    gap: 18px;
-  }
-  #rewardCompleteScreen p, #completeScreen p {
-    font-size: clamp(26px, 6vw, 44px);
-    font-weight: 800;
-    margin: 0;
-  }
-  .big-emoji {
-    font-size: clamp(56px, 14vw, 110px);
-    line-height: 1;
-  }
-  #restartBtn {
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 999px;
-    padding: 16px 32px;
-    font-size: clamp(18px, 4vw, 26px);
-    font-weight: 800;
-    box-shadow: 0 6px 0 var(--primary-dark);
-    touch-action: manipulation;
-  }
-  #restartBtn:active {
-    transform: translateY(4px);
-    box-shadow: 0 2px 0 var(--primary-dark);
-  }
+/* Intermission / session end */
+#rewardCompleteScreen,#completeScreen{
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:18px;
+  padding:18px;
+}
+#rewardCompleteScreen p,#completeScreen p{
+  font-size:clamp(25px,5.5vw,42px);
+  font-weight:800;
+  margin:0;
+}
+.big-emoji{
+  font-size:clamp(54px,13vw,100px);
+  line-height:1;
+}
 
-  /* ---------- Short landscape phones ---------- */
-  @media (orientation: landscape) and (max-height: 500px) {
-    #speakerBtn {
-      width: clamp(76px, 15vh, 130px);
-      height: clamp(76px, 15vh, 130px);
-      font-size: clamp(32px, 7vh, 58px);
-    }
-    #speakerHint { font-size: clamp(12px, 2vh, 16px); }
-    #feedbackArea { min-height: clamp(34px, 7vh, 56px); }
-    #feedbackMsg { font-size: clamp(16px, 3.2vh, 24px); }
-    #feedbackExtra { font-size: clamp(13px, 2.4vh, 18px); }
-    .answer-btn {
-      padding: clamp(10px, 2vh, 16px) 8px;
-      font-size: clamp(22px, 4.4vh, 34px);
-    }
-    #learningScreen { gap: 4px; padding: 2px 0; }
-    .game-btn {
-      width: clamp(50px, 11vh, 76px);
-      height: clamp(50px, 11vh, 76px);
-      font-size: clamp(18px, 4.4vh, 30px);
-    }
-    #gameHud { font-size: clamp(13px, 2.6vh, 18px); }
+#completeExtra{
+  font-size:clamp(16px,3.2vw,22px);
+  font-weight:650;
+  color:var(--text-soft);
+  max-width:520px;
+  line-height:1.4;
+}
+
+#restartBtn{
+  background:#fff;
+  color:var(--text-soft);
+  border:2px solid #D8D6E8;
+  border-radius:999px;
+  padding:12px 24px;
+  font-size:clamp(15px,3vw,20px);
+  font-weight:700;
+  box-shadow:none;
+  touch-action:manipulation;
+}
+#restartBtn:active{transform:scale(.98)}
+
+@media (orientation:landscape) and (max-height:500px){
+  #speakerBtn{
+    width:clamp(76px,15vh,130px);
+    height:clamp(76px,15vh,130px);
+    font-size:clamp(32px,7vh,58px);
   }
+  #feedbackArea{min-height:clamp(44px,8vh,68px)}
+  .answer-btn{
+    padding:clamp(10px,2vh,16px) 8px;
+    font-size:clamp(22px,4.4vh,34px);
+  }
+  .game-btn{
+    width:clamp(50px,11vh,76px);
+    height:clamp(50px,11vh,76px);
+    font-size:clamp(18px,4.4vh,30px);
+  }
+}
 </style>
 </head>
+
 <body>
 <div id="app">
 
   <div id="statusBar">
     <span id="levelIndicator">Stufe 1/5</span>
-    <span id="starIndicator">⭐ 0/5</span>
+    <span id="taskIndicator">Aufgabe 0/5</span>
+    <span id="sessionIndicator">Block 1/3</span>
   </div>
 
   <main id="learningScreen">
@@ -349,17 +352,19 @@
 
     <div id="answers" class="answers"></div>
 
-    <button id="resetProgressBtn" type="button">Fortschritt zurücksetzen</button>
+    <button id="resetProgressBtn" type="button">Lernstand zurücksetzen</button>
   </main>
 
   <main id="rewardScreen" class="hidden">
     <div id="gameHud">
       <span id="gameTime">Noch 10 s</span>
-      <span id="gameScore">Punkte: 0</span>
+      <span id="gameScore">Sterne: 0</span>
     </div>
+
     <div id="gameCanvasWrap">
       <canvas id="gameCanvas"></canvas>
     </div>
+
     <div id="gameControls">
       <button id="btnLeft" class="game-btn" type="button" aria-label="Links">◀</button>
       <button id="btnFire" class="game-btn" type="button" aria-label="Feuer">●</button>
@@ -368,570 +373,757 @@
   </main>
 
   <main id="rewardCompleteScreen" class="hidden">
-    <div class="big-emoji">🎉</div>
-    <p id="rewardCompleteText">Geschafft!</p>
+    <div class="big-emoji">⭐</div>
+    <p>Kurze Pause geschafft.</p>
   </main>
 
   <main id="completeScreen" class="hidden">
-    <div class="big-emoji">🏆</div>
-    <p>Alle Tabellen<br>geschafft!</p>
-    <button id="restartBtn" type="button">Noch einmal von vorne</button>
+    <div class="big-emoji">🌿</div>
+    <p id="completeText">Für heute geschafft!</p>
+    <div id="completeExtra">
+      Drei kurze Lernblöcke sind genug. Jetzt ist Zeit für etwas anderes.
+    </div>
+    <button id="restartBtn" type="button">Neue Lernrunde starten</button>
   </main>
 
 </div>
 
 <script>
-(function () {
-  "use strict";
+(function(){
+"use strict";
 
-  /* =========================================================
-     1. DATEN
-     Neue Silbentabellen können hier einfach ergänzt werden.
-     "type" bereitet den späteren Aufgabentyp "imageWord" vor
-     (Wort hören -> passendes Bild wählen), der noch nicht
-     implementiert ist, siehe renderTask().
-  ========================================================= */
+/* =========================================================
+   1. LERNINHALT
+   Pädagogische Leitplanken:
+   - 5 bearbeitete Aufgaben pro Lernblock.
+   - Das Minispiel kommt nach dem Block, unabhängig von richtig/falsch.
+   - Das Minispiel dauert immer 10 Sekunden.
+   - Fehler steuern nur Wiederholung und Lernstoff.
+   - Nach 3 Blöcken endet die Sitzung bewusst.
+========================================================= */
 
-  const levels = [
-    { name: "Vokale",       type: "audioChoice", items: ["A","E","I","O","U"],     requiredCorrect: 5, gameSeconds: 10, rate: 0.34 },
-    { name: "Silben mit M", type: "audioChoice", items: ["MA","ME","MI","MO","MU"], requiredCorrect: 5, gameSeconds: 15, rate: 0.40 },
-    { name: "Silben mit L", type: "audioChoice", items: ["LA","LE","LI","LO","LU"], requiredCorrect: 5, gameSeconds: 20, rate: 0.40 },
-    { name: "Silben mit N", type: "audioChoice", items: ["NA","NE","NI","NO","NU"], requiredCorrect: 5, gameSeconds: 25, rate: 0.40 },
-    { name: "Silben mit S", type: "audioChoice", items: ["SA","SE","SI","SO","SU"], requiredCorrect: 5, gameSeconds: 30, rate: 0.40 }
-  ];
+const levels=[
+  {name:"Vokale",type:"audioChoice",items:["A","E","I","O","U"],blockSize:5,masteryCorrect:4,gameSeconds:10,rate:0.34},
+  {name:"Silben mit M",type:"audioChoice",items:["MA","ME","MI","MO","MU"],blockSize:5,masteryCorrect:4,gameSeconds:10,rate:0.40},
+  {name:"Silben mit L",type:"audioChoice",items:["LA","LE","LI","LO","LU"],blockSize:5,masteryCorrect:4,gameSeconds:10,rate:0.40},
+  {name:"Silben mit N",type:"audioChoice",items:["NA","NE","NI","NO","NU"],blockSize:5,masteryCorrect:4,gameSeconds:10,rate:0.40},
+  {name:"Silben mit S",type:"audioChoice",items:["SA","SE","SI","SO","SU"],blockSize:5,masteryCorrect:4,gameSeconds:10,rate:0.40}
+];
 
-  // Zentrale Aussprache-Zuordnung. Der sichtbare Button-Text (z.B. "MI")
-  // wird davon NIE verändert - nur was tatsächlich gesprochen wird.
-  // E, I und MI sind erfahrungsgemäß am schwierigsten zu unterscheiden,
-  // daher bekommen die Vokale hier ein "h" angehängt, um sie in der
-  // Sprachsynthese länger und klarer klingen zu lassen. Bei Bedarf können
-  // einzelne Werte hier separat angepasst werden, ohne den Rest anzufassen.
-  const speechMap = {
-    "A": "Ah", "E": "Eh", "I": "Ih", "O": "Oh", "U": "Uh",
-    "MA": "Ma", "ME": "Me", "MI": "Mi", "MO": "Mo", "MU": "Mu",
-    "LA": "La", "LE": "Le", "LI": "Li", "LO": "Lo", "LU": "Lu",
-    "NA": "Na", "NE": "Ne", "NI": "Ni", "NO": "No", "NU": "Nu",
-    "SA": "Sa", "SE": "Se", "SI": "Si", "SO": "So", "SU": "Su"
+/* Sichtbarer Text und gesprochener Text sind bewusst getrennt. */
+const speechMap={
+  "A":"Ah","E":"Eh","I":"Ih","O":"Oh","U":"Uh",
+  "MA":"Ma","ME":"Me","MI":"Mi","MO":"Mo","MU":"Mu",
+  "LA":"La","LE":"Le","LI":"Li","LO":"Lo","LU":"Lu",
+  "NA":"Na","NE":"Ne","NI":"Ni","NO":"No","NU":"Nu",
+  "SA":"Sa","SE":"Se","SI":"Si","SO":"So","SU":"Su"
+};
+
+const vowelInfo={
+  "A":"A → Apfel 🍎",
+  "E":"E → Ente 🦆",
+  "I":"I → Igel 🦔",
+  "O":"O → Orange 🍊",
+  "U":"U → Uhu 🦉"
+};
+
+const STORAGE_KEY="deLearnProgress_v2";
+const MAX_SESSION_BLOCKS=3;
+
+const state={
+  levelIndex:0,
+  correctCount:0,
+  attemptCount:0,
+  sessionBlocks:0,
+  currentItem:null,
+  lastItem:null,
+  locked:false,
+  screen:"learning",
+  itemStats:{},
+  pendingAdvance:false,
+  courseComplete:false
+};
+
+/* =========================================================
+   2. DOM
+========================================================= */
+
+const el={
+  levelIndicator:document.getElementById("levelIndicator"),
+  taskIndicator:document.getElementById("taskIndicator"),
+  sessionIndicator:document.getElementById("sessionIndicator"),
+  learningScreen:document.getElementById("learningScreen"),
+  speakerBtn:document.getElementById("speakerBtn"),
+  speakerHint:document.getElementById("speakerHint"),
+  feedbackMsg:document.getElementById("feedbackMsg"),
+  feedbackExtra:document.getElementById("feedbackExtra"),
+  answers:document.getElementById("answers"),
+  resetProgressBtn:document.getElementById("resetProgressBtn"),
+  rewardScreen:document.getElementById("rewardScreen"),
+  gameTime:document.getElementById("gameTime"),
+  gameScore:document.getElementById("gameScore"),
+  gameCanvas:document.getElementById("gameCanvas"),
+  btnLeft:document.getElementById("btnLeft"),
+  btnFire:document.getElementById("btnFire"),
+  btnRight:document.getElementById("btnRight"),
+  rewardCompleteScreen:document.getElementById("rewardCompleteScreen"),
+  completeScreen:document.getElementById("completeScreen"),
+  completeText:document.getElementById("completeText"),
+  completeExtra:document.getElementById("completeExtra"),
+  restartBtn:document.getElementById("restartBtn")
+};
+
+/* =========================================================
+   3. SPRACHAUSGABE
+========================================================= */
+
+let germanVoice=null;
+
+function loadVoices(){
+  if(!("speechSynthesis" in window)) return;
+  const voices=window.speechSynthesis.getVoices();
+  if(!voices||!voices.length) return;
+
+  germanVoice=
+    voices.find(v=>(v.lang||"").toLowerCase()==="de-de") ||
+    voices.find(v=>(v.lang||"").toLowerCase().startsWith("de")) ||
+    null;
+}
+
+if("speechSynthesis" in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged=loadVoices;
+}
+
+function speakOnce(text,rate,callback){
+  if(!("speechSynthesis" in window)){
+    if(callback) callback();
+    return;
+  }
+
+  const utter=new SpeechSynthesisUtterance(text);
+  utter.lang="de-DE";
+  utter.rate=rate;
+  utter.pitch=1.0;
+  utter.volume=1.0;
+  if(germanVoice) utter.voice=germanVoice;
+
+  let done=false;
+  let fallbackTimer=null;
+
+  const finish=()=>{
+    if(done) return;
+    done=true;
+    if(fallbackTimer) clearTimeout(fallbackTimer);
+    if(callback) callback();
   };
 
-  const vowelInfo = {
-    "A": "A → Apfel 🍎",
-    "E": "E → Ente 🦆",
-    "I": "I → Igel 🦔",
-    "O": "O → Orange 🍊",
-    "U": "U → Uhu 🦉"
-  };
+  utter.onend=finish;
+  utter.onerror=finish;
 
-  const STORAGE_KEY = "deLearnProgress_v1";
+  const estimatedMs=Math.max(1100,(text.length*280)/Math.max(rate,0.1));
+  fallbackTimer=setTimeout(finish,estimatedMs);
 
-  /* =========================================================
-     2. STATUS
-  ========================================================= */
+  window.speechSynthesis.speak(utter);
+}
 
-  const state = {
-    levelIndex: 0,
-    correctCount: 0,
-    currentItem: null,
-    lastItem: null,
-    locked: false,       // true während Feedback/Sprachausgabe/Übergang
-    screen: "learning"   // learning | reward | rewardComplete | complete
-  };
-
-  /* =========================================================
-     3. DOM-REFERENZEN
-  ========================================================= */
-
-  const el = {
-    levelIndicator: document.getElementById("levelIndicator"),
-    starIndicator: document.getElementById("starIndicator"),
-    learningScreen: document.getElementById("learningScreen"),
-    speakerBtn: document.getElementById("speakerBtn"),
-    speakerHint: document.getElementById("speakerHint"),
-    feedbackMsg: document.getElementById("feedbackMsg"),
-    feedbackExtra: document.getElementById("feedbackExtra"),
-    answers: document.getElementById("answers"),
-    resetProgressBtn: document.getElementById("resetProgressBtn"),
-    rewardScreen: document.getElementById("rewardScreen"),
-    gameTime: document.getElementById("gameTime"),
-    gameScore: document.getElementById("gameScore"),
-    gameCanvas: document.getElementById("gameCanvas"),
-    btnLeft: document.getElementById("btnLeft"),
-    btnFire: document.getElementById("btnFire"),
-    btnRight: document.getElementById("btnRight"),
-    rewardCompleteScreen: document.getElementById("rewardCompleteScreen"),
-    rewardCompleteText: document.getElementById("rewardCompleteText"),
-    completeScreen: document.getElementById("completeScreen"),
-    restartBtn: document.getElementById("restartBtn")
-  };
-
-  /* =========================================================
-     4. SPRACHSYNTHESE
-  ========================================================= */
-
-  let germanVoice = null;
-
-  function loadVoices() {
-    if (!("speechSynthesis" in window)) return;
-    const voices = window.speechSynthesis.getVoices();
-    if (voices && voices.length) {
-      germanVoice =
-        voices.find(v => v.lang === "de-DE") ||
-        voices.find(v => v.lang && v.lang.toLowerCase().startsWith("de")) ||
-        null;
-    }
+/* Aktives Anhören: zweimal, klar getrennt. */
+function speakItem(item,rate,onComplete){
+  if(!("speechSynthesis" in window)){
+    if(onComplete) onComplete();
+    return;
   }
 
-  if ("speechSynthesis" in window) {
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-  }
+  window.speechSynthesis.cancel();
+  loadVoices();
+  const text=speechMap[item]||item;
 
-  // Spricht einen Text einmal. Ruft callback garantiert auf - auch wenn
-  // 'onend' in Safari gelegentlich nicht zuverlässig feuert (bekannter Bug),
-  // dank eines Sicherheits-Timeouts.
-  function speakOnce(text, rate, callback) {
-    if (!("speechSynthesis" in window)) { callback(); return; }
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "de-DE";
-    utter.rate = rate;
-    utter.pitch = 1.0;
-    if (germanVoice) utter.voice = germanVoice;
-
-    let done = false;
-    let fallbackTimer = null;
-    const finish = () => {
-      if (done) return;
-      done = true;
-      if (fallbackTimer) clearTimeout(fallbackTimer);
-      callback();
-    };
-    utter.onend = finish;
-    utter.onerror = finish;
-
-    const estimatedMs = Math.max(1100, (text.length * 260) / Math.max(rate, 0.1));
-    fallbackTimer = setTimeout(finish, estimatedMs);
-
-    window.speechSynthesis.speak(utter);
-  }
-
-  // Spricht ein Element (Vokal oder Silbe) genau zweimal mit kurzer Pause,
-  // wie gefordert. Laufende Sprachausgabe wird vorher sauber abgebrochen.
-  function speakItem(item, rate, onComplete) {
-    if (!("speechSynthesis" in window)) { if (onComplete) onComplete(); return; }
-    window.speechSynthesis.cancel();
-    const text = speechMap[item] || item;
-    loadVoices();
-    setTimeout(() => {
-      speakOnce(text, rate, () => {
-        setTimeout(() => {
-          speakOnce(text, rate, () => { if (onComplete) onComplete(); });
-        }, 720);
-      });
-    }, 60);
-  }
-
-  /* =========================================================
-     5. FORTSCHRITT (localStorage)
-  ========================================================= */
-
-  function saveProgress() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ levelIndex: state.levelIndex }));
-    } catch (e) { /* z.B. privater Modus - ignorieren */ }
-  }
-
-  function loadProgress() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return 0;
-      const data = JSON.parse(raw);
-      if (typeof data.levelIndex === "number" && data.levelIndex >= 0 && data.levelIndex < levels.length) {
-        return data.levelIndex;
-      }
-    } catch (e) { /* ignorieren */ }
-    return 0;
-  }
-
-  function resetProgress() {
-    try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignorieren */ }
-    startLevel(0);
-  }
-
-  /* =========================================================
-     6. LERNABLAUF
-  ========================================================= */
-
-  function updateStatusBar() {
-    const level = levels[state.levelIndex];
-    el.levelIndicator.textContent = "Stufe " + (state.levelIndex + 1) + "/" + levels.length;
-    el.starIndicator.textContent = "⭐ " + state.correctCount + "/" + level.requiredCorrect;
-  }
-
-  function pickNextItem(level) {
-    const items = level.items;
-    if (items.length === 1) return items[0];
-    let candidate;
-    do {
-      candidate = items[Math.floor(Math.random() * items.length)];
-    } while (candidate === state.lastItem);
-    return candidate;
-  }
-
-  function shuffledCopy(arr) {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
-    }
-    return a;
-  }
-
-  function startLevel(index) {
-    state.levelIndex = index;
-    state.correctCount = 0;
-    state.lastItem = null;
-    saveProgress();
-    showScreen("learning");
-    newTask();
-  }
-
-  function newTask() {
-    const level = levels[state.levelIndex];
-    state.currentItem = pickNextItem(level);
-    state.lastItem = state.currentItem;
-    state.locked = false;
-
-    updateStatusBar();
-    el.feedbackMsg.textContent = "";
-    el.feedbackMsg.className = "";
-    el.feedbackExtra.textContent = "";
-    el.speakerHint.textContent = "Tippe zum Hören";
-
-    renderTask(level);
-  }
-
-  function renderTask(level) {
-    if (level.type === "audioChoice") {
-      renderAudioChoiceAnswers(level);
-    }
-    // Zukünftig: else if (level.type === "imageWord") { renderImageWordTask(level); }
-  }
-
-  function renderAudioChoiceAnswers(level) {
-    el.answers.innerHTML = "";
-    const order = shuffledCopy(level.items);
-    order.forEach(item => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "answer-btn";
-      btn.textContent = item;
-      btn.addEventListener("click", () => handleAnswer(item, btn));
-      el.answers.appendChild(btn);
+  setTimeout(()=>{
+    speakOnce(text,rate,()=>{
+      setTimeout(()=>{
+        speakOnce(text,rate,()=>{
+          if(onComplete) onComplete();
+        });
+      },720);
     });
-    setButtonsEnabled(true);
+  },60);
+}
+
+/* Nach einem Fehler: richtige Lösung genau einmal ruhig wiederholen. */
+function speakCorrection(item,rate){
+  if(!("speechSynthesis" in window)) return;
+  window.speechSynthesis.cancel();
+  loadVoices();
+  const text=speechMap[item]||item;
+  setTimeout(()=>speakOnce(text,Math.max(rate,0.36),()=>{}),180);
+}
+
+/* =========================================================
+   4. SPEICHERN
+========================================================= */
+
+function saveProgress(){
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify({
+      levelIndex:state.levelIndex,
+      itemStats:state.itemStats
+    }));
+  }catch(e){}
+}
+
+function loadProgress(){
+  const fallback={levelIndex:0,itemStats:{}};
+
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw) return fallback;
+
+    const data=JSON.parse(raw);
+    const levelIndex=
+      (typeof data.levelIndex==="number" &&
+       data.levelIndex>=0 &&
+       data.levelIndex<levels.length)
+        ? data.levelIndex
+        : 0;
+
+    const itemStats=
+      (data.itemStats && typeof data.itemStats==="object")
+        ? data.itemStats
+        : {};
+
+    return{levelIndex,itemStats};
+  }catch(e){
+    return fallback;
+  }
+}
+
+function resetProgress(){
+  try{localStorage.removeItem(STORAGE_KEY)}catch(e){}
+  state.itemStats={};
+  state.sessionBlocks=0;
+  state.courseComplete=false;
+  startLevel(0);
+}
+
+/* =========================================================
+   5. LERNLOGIK
+========================================================= */
+
+function updateStatusBar(){
+  const level=levels[state.levelIndex];
+  el.levelIndicator.textContent="Stufe "+(state.levelIndex+1)+"/"+levels.length;
+  el.taskIndicator.textContent="Aufgabe "+state.attemptCount+"/"+level.blockSize;
+  el.sessionIndicator.textContent="Block "+Math.min(state.sessionBlocks+1,MAX_SESSION_BLOCKS)+"/"+MAX_SESSION_BLOCKS;
+}
+
+function statFor(item){
+  if(!state.itemStats[item]){
+    state.itemStats[item]={correct:0,wrong:0};
+  }
+  return state.itemStats[item];
+}
+
+/* Fehler erhöhen nur die Wahrscheinlichkeit, dass ein Laut wieder geübt wird. */
+function pickNextItem(level){
+  const candidates=level.items.filter(item=>item!==state.lastItem);
+  if(!candidates.length) return level.items[0];
+
+  const weighted=[];
+
+  candidates.forEach(item=>{
+    const s=statFor(item);
+    const difficulty=Math.max(0,s.wrong-Math.floor(s.correct/2));
+    const weight=1+Math.min(4,difficulty);
+
+    for(let i=0;i<weight;i++) weighted.push(item);
+  });
+
+  return weighted[Math.floor(Math.random()*weighted.length)];
+}
+
+function shuffledCopy(arr){
+  const a=arr.slice();
+
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
   }
 
-  function setButtonsEnabled(enabled) {
-    const buttons = el.answers.querySelectorAll(".answer-btn");
-    buttons.forEach(b => { b.disabled = !enabled; });
-    el.speakerBtn.disabled = !enabled;
-  }
+  return a;
+}
 
-  function playSpeaker() {
-    if (state.locked) return;
-    const level = levels[state.levelIndex];
-    el.speakerBtn.disabled = true;
-    speakItem(state.currentItem, level.rate, () => {
-      if (!state.locked) el.speakerBtn.disabled = false;
-    });
-  }
+function startLevel(index){
+  state.levelIndex=index;
+  state.correctCount=0;
+  state.attemptCount=0;
+  state.lastItem=null;
+  state.pendingAdvance=false;
 
-  function handleAnswer(selected, btnEl) {
-    if (state.locked) return;
-    state.locked = true;
-    setButtonsEnabled(false);
+  saveProgress();
+  showScreen("learning");
+  newTask();
+}
 
-    const level = levels[state.levelIndex];
-    const isCorrect = selected === state.currentItem;
+function newTask(){
+  const level=levels[state.levelIndex];
 
-    if (isCorrect) {
-      btnEl.classList.add("correct");
-      el.feedbackMsg.textContent = "✅ Richtig!";
-      el.feedbackMsg.className = "correct";
-      if (state.currentItem.length === 1) {
-        el.feedbackExtra.textContent = vowelInfo[state.currentItem] || "";
-      } else {
-        const c = state.currentItem[0];
-        const v = state.currentItem[1];
-        el.feedbackExtra.textContent = c + " + " + v + " → " + state.currentItem;
-      }
-      state.correctCount++;
-      updateStatusBar();
-    } else {
-      btnEl.classList.add("incorrect");
-      el.feedbackMsg.textContent = "❌ Nicht richtig. Nächste Runde!";
-      el.feedbackMsg.className = "incorrect";
-      el.feedbackExtra.textContent = "";
+  state.currentItem=pickNextItem(level);
+  state.lastItem=state.currentItem;
+  state.locked=false;
+
+  updateStatusBar();
+
+  el.feedbackMsg.textContent="";
+  el.feedbackMsg.className="";
+  el.feedbackExtra.textContent="";
+  el.speakerHint.textContent="Tippe zum Hören";
+
+  renderAudioChoiceAnswers(level);
+}
+
+function renderAudioChoiceAnswers(level){
+  el.answers.innerHTML="";
+
+  shuffledCopy(level.items).forEach(item=>{
+    const btn=document.createElement("button");
+    btn.type="button";
+    btn.className="answer-btn";
+    btn.textContent=item;
+    btn.addEventListener("click",()=>handleAnswer(item,btn));
+    el.answers.appendChild(btn);
+  });
+
+  setButtonsEnabled(true);
+}
+
+function setButtonsEnabled(enabled){
+  const buttons=el.answers.querySelectorAll(".answer-btn");
+  buttons.forEach(b=>{b.disabled=!enabled});
+  el.speakerBtn.disabled=!enabled;
+}
+
+function playSpeaker(){
+  if(state.locked) return;
+
+  const level=levels[state.levelIndex];
+  el.speakerBtn.disabled=true;
+
+  speakItem(state.currentItem,level.rate,()=>{
+    if(!state.locked) el.speakerBtn.disabled=false;
+  });
+}
+
+function handleAnswer(selected,btnEl){
+  if(state.locked) return;
+
+  state.locked=true;
+  setButtonsEnabled(false);
+
+  const level=levels[state.levelIndex];
+  const target=state.currentItem;
+  const isCorrect=selected===target;
+  const stats=statFor(target);
+
+  /* Jede bearbeitete Aufgabe zählt gleich für die Pause. */
+  state.attemptCount++;
+
+  if(isCorrect){
+    btnEl.classList.add("correct");
+
+    el.feedbackMsg.textContent="Gut zugehört!";
+    el.feedbackMsg.className="correct";
+
+    if(target.length===1){
+      el.feedbackExtra.textContent=vowelInfo[target]||"";
+    }else{
+      el.feedbackExtra.textContent=target[0]+" + "+target[1]+" → "+target;
     }
 
-    const delay = isCorrect ? 1000 : 900;
-    setTimeout(() => {
-      if (state.correctCount >= level.requiredCorrect) {
-        startReward(level);
-      } else {
-        newTask();
-      }
-    }, delay);
-  }
+    state.correctCount++;
+    stats.correct++;
+  }else{
+    btnEl.classList.add("incorrect");
 
-  /* =========================================================
-     7. BILDSCHIRM-VERWALTUNG
-  ========================================================= */
-
-  function showScreen(name) {
-    state.screen = name;
-    el.learningScreen.classList.toggle("hidden", name !== "learning");
-    el.rewardScreen.classList.toggle("hidden", name !== "reward");
-    el.rewardCompleteScreen.classList.toggle("hidden", name !== "rewardComplete");
-    el.completeScreen.classList.toggle("hidden", name !== "complete");
-  }
-
-  /* =========================================================
-     8. BELOHNUNGSSPIEL (Canvas)
-  ========================================================= */
-
-  const game = {
-    raf: null,
-    ctx: null,
-    width: 0,
-    height: 0,
-    dpr: 1,
-    shipX: 0,
-    shipY: 0,
-    shipSpeed: 260,   // px/Sekunde
-    movingLeft: false,
-    movingRight: false,
-    bullets: [],
-    stars: [],
-    score: 0,
-    endAt: 0,
-    lastTs: 0,
-    lastFireAt: 0
-  };
-
-  function startReward(level) {
-    showScreen("reward");
-    resizeCanvas();
-    game.score = 0;
-    game.bullets = [];
-    game.stars = [];
-    game.movingLeft = false;
-    game.movingRight = false;
-    game.shipX = game.width / 2;
-    game.shipY = game.height - 40;
-    game.endAt = performance.now() + level.gameSeconds * 1000;
-    game.lastTs = performance.now();
-    game.lastFireAt = 0;
-
-    for (let i = 0; i < 5; i++) spawnStar();
-
-    updateGameHud(level.gameSeconds, 0);
-
-    if (game.raf) cancelAnimationFrame(game.raf);
-    game.raf = requestAnimationFrame(gameLoop);
-  }
-
-  function resizeCanvas() {
-    const wrap = el.gameCanvas.parentElement;
-    const rect = wrap.getBoundingClientRect();
-    game.dpr = Math.min(window.devicePixelRatio || 1, 2);
-    game.width = Math.max(1, Math.round(rect.width));
-    game.height = Math.max(1, Math.round(rect.height));
-    el.gameCanvas.width = Math.round(game.width * game.dpr);
-    el.gameCanvas.height = Math.round(game.height * game.dpr);
-    game.ctx = el.gameCanvas.getContext("2d");
-    game.ctx.setTransform(game.dpr, 0, 0, game.dpr, 0, 0);
-    game.shipX = Math.min(game.shipX || game.width / 2, game.width - 24);
-    game.shipY = game.height - 40;
-  }
-
-  function spawnStar() {
-    game.stars.push({
-      x: 24 + Math.random() * Math.max(1, game.width - 48),
-      y: -20 - Math.random() * 220,
-      speed: 40 + Math.random() * 50,
-      size: 12 + Math.random() * 7
+    /* Die richtige Antwort wird gezeigt, aber es gibt keinen zweiten Tipp. */
+    const buttons=el.answers.querySelectorAll(".answer-btn");
+    buttons.forEach(b=>{
+      if(b.textContent===target) b.classList.add("correct");
     });
+
+    el.feedbackMsg.textContent="Noch nicht. Das war "+target+".";
+    el.feedbackMsg.className="incorrect";
+    el.feedbackExtra.textContent="Hör die richtige Lösung noch einmal.";
+
+    stats.wrong++;
+    speakCorrection(target,level.rate);
   }
 
-  function gameLoop(ts) {
-    const level = levels[state.levelIndex];
-    const dt = Math.min(0.05, (ts - game.lastTs) / 1000);
-    game.lastTs = ts;
+  updateStatusBar();
+  saveProgress();
 
-    const remaining = Math.max(0, (game.endAt - ts) / 1000);
-    if (remaining <= 0) {
-      finishReward();
+  const delay=isCorrect?1050:1750;
+
+  setTimeout(()=>{
+    if(state.attemptCount>=level.blockSize){
+      /*
+        4/5 oder 5/5: nächste Stufe.
+        Unter 4/5: gleiche Stufe noch einmal.
+        Der Zugang zur Pause hängt davon NICHT ab.
+      */
+      state.pendingAdvance=state.correctCount>=level.masteryCorrect;
+      startReward();
+    }else{
+      newTask();
+    }
+  },delay);
+}
+
+/* =========================================================
+   6. BILDSCHIRME
+========================================================= */
+
+function showScreen(name){
+  state.screen=name;
+
+  el.learningScreen.classList.toggle("hidden",name!=="learning");
+  el.rewardScreen.classList.toggle("hidden",name!=="reward");
+  el.rewardCompleteScreen.classList.toggle("hidden",name!=="rewardComplete");
+  el.completeScreen.classList.toggle("hidden",name!=="complete");
+}
+
+/* =========================================================
+   7. 10-SEKUNDEN-PAUSENSPIEL
+   Kein Highscore, keine Eskalation, keine Bonusmechanik.
+========================================================= */
+
+const game={
+  raf:null,
+  ctx:null,
+  width:0,
+  height:0,
+  dpr:1,
+  shipX:0,
+  shipY:0,
+  shipSpeed:260,
+  movingLeft:false,
+  movingRight:false,
+  bullets:[],
+  stars:[],
+  score:0,
+  endAt:0,
+  lastTs:0,
+  lastFireAt:0
+};
+
+function startReward(){
+  showScreen("reward");
+  resizeCanvas();
+
+  game.score=0;
+  game.bullets=[];
+  game.stars=[];
+  game.movingLeft=false;
+  game.movingRight=false;
+  game.shipX=game.width/2;
+  game.shipY=game.height-40;
+  game.endAt=performance.now()+10000;
+  game.lastTs=performance.now();
+  game.lastFireAt=0;
+
+  for(let i=0;i<5;i++) spawnStar();
+
+  updateGameHud(10,0);
+
+  if(game.raf) cancelAnimationFrame(game.raf);
+  game.raf=requestAnimationFrame(gameLoop);
+}
+
+function resizeCanvas(){
+  const wrap=el.gameCanvas.parentElement;
+  const rect=wrap.getBoundingClientRect();
+
+  game.dpr=Math.min(window.devicePixelRatio||1,2);
+  game.width=Math.max(1,Math.round(rect.width));
+  game.height=Math.max(1,Math.round(rect.height));
+
+  el.gameCanvas.width=Math.round(game.width*game.dpr);
+  el.gameCanvas.height=Math.round(game.height*game.dpr);
+
+  game.ctx=el.gameCanvas.getContext("2d");
+  game.ctx.setTransform(game.dpr,0,0,game.dpr,0,0);
+
+  game.shipX=Math.min(game.shipX||game.width/2,game.width-24);
+  game.shipY=game.height-40;
+}
+
+function spawnStar(){
+  game.stars.push({
+    x:24+Math.random()*Math.max(1,game.width-48),
+    y:-20-Math.random()*220,
+    speed:40+Math.random()*50,
+    size:12+Math.random()*7
+  });
+}
+
+function gameLoop(ts){
+  const dt=Math.min(.05,(ts-game.lastTs)/1000);
+  game.lastTs=ts;
+
+  const remaining=Math.max(0,(game.endAt-ts)/1000);
+
+  if(remaining<=0){
+    finishReward();
+    return;
+  }
+
+  if(game.movingLeft) game.shipX-=game.shipSpeed*dt;
+  if(game.movingRight) game.shipX+=game.shipSpeed*dt;
+
+  game.shipX=Math.max(24,Math.min(game.width-24,game.shipX));
+
+  for(let i=game.bullets.length-1;i>=0;i--){
+    game.bullets[i].y-=320*dt;
+    if(game.bullets[i].y<-10) game.bullets.splice(i,1);
+  }
+
+  for(let i=game.stars.length-1;i>=0;i--){
+    game.stars[i].y+=game.stars[i].speed*dt;
+    if(game.stars[i].y>game.height+20) game.stars.splice(i,1);
+  }
+
+  while(game.stars.length<5) spawnStar();
+
+  for(let i=game.bullets.length-1;i>=0;i--){
+    const b=game.bullets[i];
+
+    for(let j=game.stars.length-1;j>=0;j--){
+      const s=game.stars[j];
+      const dx=b.x-s.x;
+      const dy=b.y-s.y;
+
+      if(Math.sqrt(dx*dx+dy*dy)<s.size+4){
+        game.bullets.splice(i,1);
+        game.stars.splice(j,1);
+        game.score++;
+        spawnStar();
+        break;
+      }
+    }
+  }
+
+  drawGame();
+  updateGameHud(remaining,game.score);
+
+  game.raf=requestAnimationFrame(gameLoop);
+}
+
+function drawGame(){
+  const ctx=game.ctx;
+  if(!ctx) return;
+
+  ctx.clearRect(0,0,game.width,game.height);
+
+  const grad=ctx.createLinearGradient(0,0,0,game.height);
+  grad.addColorStop(0,"#211c5e");
+  grad.addColorStop(1,"#06071c");
+
+  ctx.fillStyle=grad;
+  ctx.fillRect(0,0,game.width,game.height);
+
+  ctx.fillStyle="#FFD65C";
+  game.stars.forEach(s=>drawStarShape(ctx,s.x,s.y,s.size));
+
+  ctx.fillStyle="#4FD1FF";
+  game.bullets.forEach(b=>{
+    ctx.fillRect(b.x-3,b.y-10,6,14);
+  });
+
+  drawShip(ctx,game.shipX,game.shipY);
+}
+
+function drawStarShape(ctx,cx,cy,r){
+  ctx.beginPath();
+
+  for(let i=0;i<5;i++){
+    const a1=(Math.PI*2/5)*i-Math.PI/2;
+    const a2=a1+Math.PI/5;
+
+    const ox=cx+r*Math.cos(a1);
+    const oy=cy+r*Math.sin(a1);
+    const ix=cx+(r/2.4)*Math.cos(a2);
+    const iy=cy+(r/2.4)*Math.sin(a2);
+
+    if(i===0) ctx.moveTo(ox,oy);
+    else ctx.lineTo(ox,oy);
+
+    ctx.lineTo(ix,iy);
+  }
+
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawShip(ctx,x,y){
+  ctx.fillStyle="#4FD1FF";
+  ctx.beginPath();
+  ctx.moveTo(x,y-20);
+  ctx.lineTo(x-18,y+16);
+  ctx.lineTo(x,y+7);
+  ctx.lineTo(x+18,y+16);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle="#FF7A50";
+  ctx.beginPath();
+  ctx.arc(x,y-2,5,0,Math.PI*2);
+  ctx.fill();
+}
+
+function updateGameHud(secondsLeft,score){
+  el.gameTime.textContent="Noch "+Math.ceil(secondsLeft)+" s";
+  el.gameScore.textContent="Sterne: "+score;
+}
+
+function fireBullet(){
+  const now=performance.now();
+  if(now-game.lastFireAt<220) return;
+
+  game.lastFireAt=now;
+  game.bullets.push({
+    x:game.shipX,
+    y:game.shipY-16
+  });
+}
+
+function finishReward(){
+  if(game.raf) cancelAnimationFrame(game.raf);
+
+  game.raf=null;
+  game.movingLeft=false;
+  game.movingRight=false;
+
+  state.sessionBlocks++;
+
+  const passedBlock=state.pendingAdvance;
+  const isLastLevel=state.levelIndex===levels.length-1;
+  const completedCourse=passedBlock&&isLastLevel;
+
+  showScreen("rewardComplete");
+
+  setTimeout(()=>{
+    if(completedCourse){
+      state.courseComplete=true;
+
+      el.completeText.innerHTML="Alle Tabellen<br>geschafft!";
+      el.completeExtra.textContent="Sehr gut. Für heute ist die Lernrunde beendet.";
+      el.restartBtn.textContent="Später noch einmal";
+
+      try{localStorage.removeItem(STORAGE_KEY)}catch(e){}
+      showScreen("complete");
       return;
     }
 
-    if (game.movingLeft) game.shipX -= game.shipSpeed * dt;
-    if (game.movingRight) game.shipX += game.shipSpeed * dt;
-    game.shipX = Math.max(24, Math.min(game.width - 24, game.shipX));
-
-    for (let i = game.bullets.length - 1; i >= 0; i--) {
-      game.bullets[i].y -= 320 * dt;
-      if (game.bullets[i].y < -10) game.bullets.splice(i, 1);
+    if(passedBlock){
+      state.levelIndex++;
     }
 
-    for (let i = game.stars.length - 1; i >= 0; i--) {
-      game.stars[i].y += game.stars[i].speed * dt;
-      if (game.stars[i].y > game.height + 20) game.stars.splice(i, 1);
-    }
-    while (game.stars.length < 5) spawnStar();
+    saveProgress();
 
-    for (let i = game.bullets.length - 1; i >= 0; i--) {
-      const b = game.bullets[i];
-      for (let j = game.stars.length - 1; j >= 0; j--) {
-        const s = game.stars[j];
-        const dx = b.x - s.x, dy = b.y - s.y;
-        if (Math.sqrt(dx * dx + dy * dy) < s.size + 4) {
-          game.bullets.splice(i, 1);
-          game.stars.splice(j, 1);
-          game.score++;
-          spawnStar();
-          break;
-        }
-      }
+    if(state.sessionBlocks>=MAX_SESSION_BLOCKS){
+      el.completeText.textContent="Für heute geschafft!";
+      el.completeExtra.textContent="15 Aufgaben und drei kurze Pausen sind genug. Jetzt ist Zeit für etwas anderes.";
+      el.restartBtn.textContent="Neue Lernrunde starten";
+      showScreen("complete");
+      return;
     }
 
-    drawGame();
-    updateGameHud(remaining, game.score);
+    /*
+      Bei weniger als 4/5 richtigen Antworten bleibt die Stufe gleich.
+      Die schwereren Elemente werden automatisch häufiger gewählt.
+    */
+    startLevel(state.levelIndex);
+  },1600);
+}
 
-    game.raf = requestAnimationFrame(gameLoop);
+/* =========================================================
+   8. SPIELSTEUERUNG
+========================================================= */
+
+function bindHold(button,onStart,onEnd){
+  const start=e=>{
+    e.preventDefault();
+    button.classList.add("pressed");
+    onStart();
+  };
+
+  const end=e=>{
+    if(e) e.preventDefault();
+    button.classList.remove("pressed");
+    onEnd();
+  };
+
+  button.addEventListener("pointerdown",start);
+  button.addEventListener("pointerup",end);
+  button.addEventListener("pointercancel",end);
+  button.addEventListener("pointerleave",end);
+}
+
+bindHold(
+  el.btnLeft,
+  ()=>{game.movingLeft=true},
+  ()=>{game.movingLeft=false}
+);
+
+bindHold(
+  el.btnRight,
+  ()=>{game.movingRight=true},
+  ()=>{game.movingRight=false}
+);
+
+el.btnFire.addEventListener("pointerdown",e=>{
+  e.preventDefault();
+  fireBullet();
+});
+
+window.addEventListener("resize",()=>{
+  if(state.screen==="reward") resizeCanvas();
+});
+
+window.addEventListener("orientationchange",()=>{
+  setTimeout(()=>{
+    if(state.screen==="reward") resizeCanvas();
+  },200);
+});
+
+/* =========================================================
+   9. EVENTS
+========================================================= */
+
+el.speakerBtn.addEventListener("click",playSpeaker);
+
+el.resetProgressBtn.addEventListener("click",()=>{
+  if(window.confirm("Lernstand wirklich zurücksetzen?")){
+    resetProgress();
+  }
+});
+
+el.restartBtn.addEventListener("click",()=>{
+  if(state.courseComplete){
+    resetProgress();
+    return;
   }
 
-  function drawGame() {
-    const ctx = game.ctx;
-    if (!ctx) return;
-    ctx.clearRect(0, 0, game.width, game.height);
+  state.sessionBlocks=0;
+  startLevel(state.levelIndex);
+});
 
-    const grad = ctx.createLinearGradient(0, 0, 0, game.height);
-    grad.addColorStop(0, "#211c5e");
-    grad.addColorStop(1, "#06071c");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, game.width, game.height);
+/* =========================================================
+   10. START
+========================================================= */
 
-    ctx.fillStyle = "#FFD65C";
-    game.stars.forEach(s => drawStarShape(ctx, s.x, s.y, s.size));
-
-    ctx.fillStyle = "#4FD1FF";
-    game.bullets.forEach(b => { ctx.fillRect(b.x - 3, b.y - 10, 6, 14); });
-
-    drawShip(ctx, game.shipX, game.shipY);
-  }
-
-  function drawStarShape(ctx, cx, cy, r) {
-    ctx.beginPath();
-    for (let i = 0; i < 5; i++) {
-      const a1 = (Math.PI * 2 / 5) * i - Math.PI / 2;
-      const a2 = a1 + Math.PI / 5;
-      const ox = cx + r * Math.cos(a1), oy = cy + r * Math.sin(a1);
-      const ix = cx + (r / 2.4) * Math.cos(a2), iy = cy + (r / 2.4) * Math.sin(a2);
-      if (i === 0) ctx.moveTo(ox, oy); else ctx.lineTo(ox, oy);
-      ctx.lineTo(ix, iy);
-    }
-    ctx.closePath();
-    ctx.fill();
-  }
-
-  function drawShip(ctx, x, y) {
-    ctx.fillStyle = "#4FD1FF";
-    ctx.beginPath();
-    ctx.moveTo(x, y - 20);
-    ctx.lineTo(x - 18, y + 16);
-    ctx.lineTo(x, y + 7);
-    ctx.lineTo(x + 18, y + 16);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.fillStyle = "#FF7A50";
-    ctx.beginPath();
-    ctx.arc(x, y - 2, 5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  function updateGameHud(secondsLeft, score) {
-    el.gameTime.textContent = "Noch " + Math.ceil(secondsLeft) + " s";
-    el.gameScore.textContent = "Punkte: " + score;
-  }
-
-  function fireBullet() {
-    const now = performance.now();
-    if (now - game.lastFireAt < 220) return;
-    game.lastFireAt = now;
-    game.bullets.push({ x: game.shipX, y: game.shipY - 16 });
-  }
-
-  function finishReward() {
-    if (game.raf) cancelAnimationFrame(game.raf);
-    game.raf = null;
-    game.movingLeft = false;
-    game.movingRight = false;
-
-    el.rewardCompleteText.textContent = "Geschafft! " + game.score + " Punkte.";
-    showScreen("rewardComplete");
-
-    setTimeout(() => {
-      const nextIndex = state.levelIndex + 1;
-      if (nextIndex < levels.length) {
-        startLevel(nextIndex);
-      } else {
-        try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignorieren */ }
-        showScreen("complete");
-      }
-    }, 2200);
-  }
-
-  /* ---- Steuerung Belohnungsspiel ---- */
-
-  function bindHold(button, onStart, onEnd) {
-    const start = (e) => { e.preventDefault(); button.classList.add("pressed"); onStart(); };
-    const end = (e) => { if (e) e.preventDefault(); button.classList.remove("pressed"); onEnd(); };
-    button.addEventListener("pointerdown", start);
-    button.addEventListener("pointerup", end);
-    button.addEventListener("pointercancel", end);
-    button.addEventListener("pointerleave", end);
-  }
-
-  bindHold(el.btnLeft, () => { game.movingLeft = true; }, () => { game.movingLeft = false; });
-  bindHold(el.btnRight, () => { game.movingRight = true; }, () => { game.movingRight = false; });
-  el.btnFire.addEventListener("pointerdown", (e) => { e.preventDefault(); fireBullet(); });
-
-  window.addEventListener("resize", () => {
-    if (state.screen === "reward") resizeCanvas();
-  });
-  window.addEventListener("orientationchange", () => {
-    setTimeout(() => { if (state.screen === "reward") resizeCanvas(); }, 200);
-  });
-
-  /* =========================================================
-     9. EVENT-BINDUNGS (Lernbildschirm)
-  ========================================================= */
-
-  el.speakerBtn.addEventListener("click", playSpeaker);
-
-  el.resetProgressBtn.addEventListener("click", () => {
-    if (window.confirm("Fortschritt wirklich zurücksetzen?")) resetProgress();
-  });
-
-  el.restartBtn.addEventListener("click", resetProgress);
-
-  /* =========================================================
-     10. START
-  ========================================================= */
-
-  startLevel(loadProgress());
+const saved=loadProgress();
+state.itemStats=saved.itemStats||{};
+startLevel(saved.levelIndex);
 
 })();
 </script>
